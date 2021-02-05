@@ -1,5 +1,7 @@
-import markets
 import time
+import markets
+import balance
+from currency import currency
 
 """cómo funciona este bot?
 Se le entregan las configuraciones
@@ -16,13 +18,13 @@ signature ="""
     │                por Ignacio Díaz                │
     │         https://github.com/ignacio-diaz        │
     │                                                │
-    │            me invitas un café?                 │
+    │              me invitas un café?               │
     │ DAI:0x4df0b2b46368be952517eab612944688c11e288d │
     │                                                │
     └────────────────────────────────────────────────┘"""
 
 print(signature)
-time.sleep(5)
+time.sleep(0)
 try:
     api_key = open("api_key.txt").read().strip()
     secret_key = open("secret_key.txt").read().strip()
@@ -37,8 +39,20 @@ try:
     amount = configs.readline().strip()
 except:
     market_list = markets.get_markets(api_key, secret_key)
-    print(f"En qué mercado te interesa tranzar? mercados disponibles: \n{market_list}\n\n")
+    final_markets = []
+    for market in market_list:
+        if market['isMaintenance'] == False:
+            final_markets.append(market['code'])
+    print(f"En qué mercado te interesa tranzar? mercados disponibles: \n{final_markets}\n\n")
     market = input("(Escribe el mercado sin las '' y en MAYUSCULAS): ")
+    for market_ in market_list:
+        if market == market_['code']:
+            market_name = market_['name']
+    markets_names = market_name.split("/")
+    market_1 = markets_names[0]
+    market_2 = markets_names[1]
+    balance_in_wallet_1 = balance.balance_wallet(market_1, api_key, secret_key) 
+    wallet_1_units = currency(market_1, api_key, secret_key)
 
 print("lalala")
 

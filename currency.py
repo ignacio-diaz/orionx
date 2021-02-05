@@ -1,19 +1,18 @@
 import json, time, requests
 from new_position import hmac_sha512 
 
-def get_markets(api_key, secret_key):
+def currency(market, api_key, secret_key):
     query_str = '''
-    query {
-        markets {
-            code
-            isMaintenance
-            name
+    query($code: ID){
+        currency(code: $code) {
+            units
         }
     }
     '''
-
+    variables = {'code': market}
     query = {
-    'query': query_str
+    'query': query_str,
+    'variables': variables
     }
 
     body = json.dumps(query)
@@ -29,6 +28,6 @@ def get_markets(api_key, secret_key):
     response = requests.post('https://api2.orionx.com/graphql', headers=headers, data=body)
     data = json.loads(response.text)
     data = data['data']
-    markets = data['markets']
-
-    return markets
+    units = data['currency']['units']
+    
+    return units

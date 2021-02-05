@@ -32,13 +32,13 @@ async def new_position(isSelling, api_key, secret_key, variables):
   variables = {
       # codigo del mercado:
       # DAI - Pesos Chilenos
-      'marketCode': d['trade'],
+      #'marketCode': d['trade'],
       # 'amount' define el monto (de venta o compra) en escala 10e-8
-      'amount': int(d['amount']*100000000),
+      #'amount': int(d['amount']*100000000),
       # 'limitPrice' es el precio de compra o venta.
-      'limitPrice': d['price'],
+      #'limitPrice': d['price'],
       # 'sell' especifica si es compra o venta en booleano (sell=True => venta, sell=False => compra)
-      'sell': d['sell']
+      #'sell': d['sell']
       }
 
   # se junta en una sola variable
@@ -55,10 +55,8 @@ async def new_position(isSelling, api_key, secret_key, variables):
   timestamp = str(time.time())
 
   # Llenar con la Api Key
-  api_key = 
 
   # Llenar con el secret key
-  secret_key =
 
   # String del codigo HMAC
   signature = str(hmac_sha512(secret_key, timestamp, body))
