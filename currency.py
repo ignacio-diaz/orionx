@@ -6,6 +6,9 @@ def currency(market, api_key, secret_key):
     query($code: ID){
         currency(code: $code) {
             units
+            myWallet {
+                availableBalance
+            }
         }
     }
     '''
@@ -29,5 +32,19 @@ def currency(market, api_key, secret_key):
     data = json.loads(response.text)
     data = data['data']
     units = data['currency']['units']
+    balance = data['currency']['myWallet']['availableBalance']
     
-    return units
+    return [units, balance]
+
+"""
+{
+  "data": {
+    "currency": {
+      "units": 8,
+      "myWallet": {
+        "availableBalance": 659833
+      }
+    }
+  }
+}
+"""

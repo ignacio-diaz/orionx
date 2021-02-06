@@ -1,6 +1,5 @@
 import time
 import markets
-import balance
 from currency import currency
 
 """cómo funciona este bot?
@@ -10,6 +9,14 @@ is_selling
 amount
 api_key
 secret_key"""
+
+def balance_in_wallets(market_1):
+    #balance_in_wallet_1 = float(balance_wallet(market_1, api_key, secret_key))
+    wallet = currency(market_1, api_key, secret_key)
+    for x in range(wallet[0]):
+        wallet[1] /= 10
+    wallet[1] = round(wallet[1], wallet[0])
+    return wallet[1]
 
 signature ="""
     ┌────────────────────────────────────────────────┐
@@ -29,8 +36,8 @@ try:
     api_key = open("api_key.txt").read().strip()
     secret_key = open("secret_key.txt").read().strip()
 except:
-    api_key = input("Ingresa tu API_KEY: ")
-    secret_key = input("Ingresa tu SECRET_KEY: ")
+    api_key = input("Ingresa tu API_KEY : ")
+    secret_key = input("Ingresa tu SECRET_KEY : ")
 
 try:
     configs = open("configs.txt")
@@ -51,8 +58,9 @@ except:
     markets_names = market_name.split("/")
     market_1 = markets_names[0]
     market_2 = markets_names[1]
-    balance_in_wallet_1 = balance.balance_wallet(market_1, api_key, secret_key) 
-    wallet_1_units = currency(market_1, api_key, secret_key)
-
+    wallet_1 = balance_in_wallets(market_1)
+    wallet_2 = balance_in_wallets(market_2)
+    print(f"Tienes un monto de {wallet_1} en {market_1}, y {wallet_2} en {market_2}")
+    config_selling = input(f"Deseas partir comprando[C] o vendiendo[V] {market_1}? : ")
 print("lalala")
-
+print("another thing")
