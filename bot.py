@@ -12,14 +12,18 @@ amount
 api_key
 secret_key"""
 def human_to_machine(decimals, amount):
+    if decimals == 0:
+        return amount
     for x in range(decimals):
-        amount /= 10
+        amount *= 10
     amount = round(amount, decimals)
     return amount
 
 def machine_to_human(decimals, amount):
+    if decimals == 0:
+        return amount
     for x in range(decimals):
-        amount *= 10
+        amount /= 10
     amount = round(amount, decimals)
     return amount
 
@@ -116,23 +120,32 @@ market_splitted = market_splitter(market_list)
 if config_selling == "v" or config_selling == "V":
     sell = True
     wallet = balance_in_wallets(market_splitted[0])
-    units = currency(market, api_key, secret_key)
-    if amount > wallet:
+    units_amount_first_currency = currency(market_splitted[0], api_key, secret_key)
+    units_amount_second_currency = currency(market_splitted[1], api_key, secret_key)
+    amount_in_human = machine_to_human(units_amount_first_currency[0], units_amount_first_currency[1])
+    if amount > amount_in_human:
         print("monto superior a lo que hay en la billetera. cerrando bot.")
         sys.exit(1)
 elif config_selling == "c" or config_selling == "C":
     sell = False
     wallet = balance_in_wallets(market_splitted[1])
-    units = currency(market_splitted[1], api_key, secret_key)
-    if amount > wallet:
-        print("monto superior a lo que hay en la billetera. cerrando bot.")
+    units_amount_second_currency = currency(market_splitted[1], api_key, secret_key)
+    units_amount_first_currency = currency(market_splitted[0], api_key, secret_key)
+    amount_in_machine = human_to_machine(units_amount_first_currency[0], units_amount_first_currency[1])
+    amount_to_buy = query_market_amount_to_spend(market, amount_in_machine, sell, api_key, secret_key)
+    if amount > amount_in_human:
+        print("monto superior a lo que hay en la billetera. cerrando")
         sys.exit(1)
 else:
     print("bot mal configurado (V o C). Cerrando el bot")
     sys.exit(1)
 
-amount_in_human = machine_to_human(units, amount)
+#amount_in_human = machine_to_human(units[0], amount)
+units_2 = currency(market_splitted[0], api_key, secret_key)
+amount_in_human = machine_to_human(units_2[0], amount)
 amount_to_spend = query_market_amount_to_spend(market, amount_in_human, sell, api_key, secret_key)
+
+print("holi")
 limit_fee = fee_limit(api_key, secret_key)
 
 
