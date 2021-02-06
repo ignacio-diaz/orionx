@@ -1,7 +1,8 @@
 import time, sys
 import markets
 from currency import currency
-from fees import limit_fee
+from fees import fee_limit
+from market_estimate_amount_to_spend import query_market_amount_to_spend
 
 """cómo funciona este bot?
 Se le entregan las configuraciones
@@ -10,13 +11,22 @@ is_selling
 amount
 api_key
 secret_key"""
+def human_to_machine(decimals, amount):
+    for x in range(decimals):
+        amount /= 10
+    amount = round(amount, decimals)
+    return amount
+
+def machine_to_human(decimals, amount):
+    for x in range(decimals):
+        amount *= 10
+    amount = round(amount, decimals)
+    return amount
 
 def balance_in_wallets(market):
     wallet = currency(market, api_key, secret_key)
-    for x in range(wallet[0]):
-        wallet[1] /= 10
-    wallet[1] = round(wallet[1], wallet[0])
-    return wallet[1]
+    wallet = human_to_machine(wallet[0], wallet[1])
+    return wallet
 
 def market_splitter(market_list):
     for market_ in market_list:
@@ -105,18 +115,24 @@ market_list = markets.get_markets(api_key, secret_key)
 market_splitted = market_splitter(market_list)
 if config_selling == "v" or config_selling == "V":
     sell = True
-    wallet_1 = balance_in_wallets(market_splitted[0])
-    if amount > wallet_1:
+    wallet = balance_in_wallets(market_splitted[0])
+    units = currency(market, api_key, secret_key)
+    if amount > wallet:
         print("monto superior a lo que hay en la billetera. cerrando bot.")
         sys.exit(1)
 elif config_selling == "c" or config_selling == "C":
     sell = False
-    wallet_2 = balance_in_wallets(market_splitted[1])
-    if amount > wallet_2:
+    wallet = balance_in_wallets(market_splitted[1])
+    units = currency(market_splitted[1], api_key, secret_key)
+    if amount > wallet:
         print("monto superior a lo que hay en la billetera. cerrando bot.")
         sys.exit(1)
 else:
     print("bot mal configurado (V o C). Cerrando el bot")
     sys.exit(1)
 
-fee_limit = limit_fee(api_key, secret_key)
+amount_in_human = machine_to_human(units, amount)
+amount_to_spend = query_market_amount_to_spend(market, amount_in_human, sell, api_key, secret_key)
+limit_fee = fee_limit(api_key, secret_key)
+
+

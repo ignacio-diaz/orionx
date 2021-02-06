@@ -1,20 +1,21 @@
 import json, time, requests
 from new_position import hmac_sha512 
 
-def fee_limit(api_key, secret_key):
+def query_market_amount_to_spend(market, amount, sell, api_key, secret_key):
     query_str = '''
-    query {
-        me {
-            marketFees {
-                market
-                limit
-            }
-        }
+    query($marketCode: ID!, $amount: Float!, $sell: Boolean!){
+        marketEstimateAmountToSpend(marketCode: $marketCode, amount: $amount, sell: $sell)
     }
     '''
+    variables = {
+        'marketCode': market,
+        'amount': amount,
+        'sell': sell
+        }
 
     query = {
-    'query': query_str
+    'query': query_str,
+    'variables': variables
     }
 
     body = json.dumps(query)
@@ -30,6 +31,6 @@ def fee_limit(api_key, secret_key):
     response = requests.post('https://api2.orionx.com/graphql', headers=headers, data=body)
     data = json.loads(response.text)
     data = data['data']
-    limit_fee = data['me']['marketFees']['limit']
-
-    return limit_fee
+    amount_to_spend = data["marketEstimateAmountToSpend"]
+    
+    return amount_to_spend
