@@ -1,4 +1,4 @@
-import time
+import time, sys
 import markets
 from currency import currency
 
@@ -42,7 +42,7 @@ except:
 try:
     configs = open("configs.txt")
     market = configs.readline().strip()
-    is_selling = configs.readline().strip()
+    config_selling = configs.readline().strip()
     amount = configs.readline().strip()
 except:
     market_list = markets.get_markets(api_key, secret_key)
@@ -62,5 +62,23 @@ except:
     wallet_2 = balance_in_wallets(market_2)
     print(f"Tienes un monto de {wallet_1} en {market_1}, y {wallet_2} en {market_2}")
     config_selling = input(f"Deseas partir comprando[C] o vendiendo[V] {market_1}? : ")
-print("lalala")
-print("another thing")
+    amount = float(input("Con qué monto deseas empezar? : "))
+    decition = input("comenzar? s/N : ")
+    if not(decition == "s" or decition == "S"):
+        print("Cerrando el bot")
+        sys.exit(1)
+
+#comprobation 
+if config_selling == "v" or config_selling == "V":
+    if amount > wallet_1:
+        print("monto superior a lo que hay en la billetera. cerrando bot.")
+        sys.exit(1)
+elif config_selling == "c" or config_selling == "C":
+    if amount > wallet_2:
+        print("monto superior a lo que hay en la billetera. cerrando bot.")
+        sys.exit(1)
+else:
+    print("bot mal configurado (V o C). Cerrando el bot")
+    sys.exit(1)
+
+
