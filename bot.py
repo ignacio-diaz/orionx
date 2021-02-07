@@ -3,6 +3,8 @@ import markets
 from currency import currency
 from fees import fee_limit
 from market_estimate_amount_to_spend import query_market_amount_to_spend
+from new_position import new_position
+from order import order
 
 """cómo funciona este bot?
 Se le entregan las configuraciones
@@ -16,7 +18,7 @@ def human_to_machine(decimals, amount):
         return amount
     for x in range(decimals):
         amount *= 10
-    amount = round(amount, decimals)
+    amount = int(round(amount, decimals))
     return amount
 
 def machine_to_human(decimals, amount):
@@ -131,21 +133,43 @@ elif config_selling == "c" or config_selling == "C":
     wallet = balance_in_wallets(market_splitted[1])
     units_amount_second_currency = currency(market_splitted[1], api_key, secret_key)
     units_amount_first_currency = currency(market_splitted[0], api_key, secret_key)
-    amount_in_machine = human_to_machine(units_amount_first_currency[0], units_amount_first_currency[1])
-    amount_to_buy = query_market_amount_to_spend(market, amount_in_machine, sell, api_key, secret_key)
-    if amount > amount_in_human:
+    amount_first_currency_in_machine = human_to_machine(units_amount_first_currency[0], amount)
+    amount_to_buy = query_market_amount_to_spend(market, amount_first_currency_in_machine, sell, api_key, secret_key)
+    if amount_to_buy > wallet:
         print("monto superior a lo que hay en la billetera. cerrando")
         sys.exit(1)
 else:
     print("bot mal configurado (V o C). Cerrando el bot")
     sys.exit(1)
 
-#amount_in_human = machine_to_human(units[0], amount)
-units_2 = currency(market_splitted[0], api_key, secret_key)
-amount_in_human = machine_to_human(units_2[0], amount)
-amount_to_spend = query_market_amount_to_spend(market, amount_in_human, sell, api_key, secret_key)
+
+limit_fee = fee_limit(api_key, secret_key)
+
+"""next step:
+buy/sell the config amount. 
+if buy, then add the (%) from what we bought and put a sell position with a price of buyed + x%.
+if sell, then add the (%) from what we sold and put a buy position  with a price of selled - x%.
+
+then every 60 secs, see if the position has been filled. If was filled, then start  the process in the other direction."""
+
+filled = 0
+cicles = 0
+
+position = new_position(api_key, secret_key, market, (amount_first_currency_in_machine / (1 - limit_fee)), 100000000, sell)
+if position['trades'] == []:
+    trades = order(api_key, secret_key, position['_id'])
+    position['trades'] = trades['trades']
+
+if len(position['trades']) > 1:
+    for x in len(position['trades']):
+        print("prueba")
+
+
+
+
+
 
 print("holi")
-limit_fee = fee_limit(api_key, secret_key)
+
 
 

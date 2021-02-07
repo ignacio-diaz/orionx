@@ -15,15 +15,16 @@ def hmac_sha512(secret_key, timestamp, body):
 
     return hmac.HMAC(key, msg, sha512).hexdigest()
 
-def new_position(api_key, secret_key, marketCode, amount, limitPrice, sell):
+def order(api_key, secret_key, orderId):
 
     #print(f"comienzo meter {time.time()}") 
 
     #se crea el mensaje para poner posiciones
     query_str = '''
-        mutation ($marketCode: ID, $amount: BigInt, $limitPrice: BigInt, $sell: Boolean){
-            placeLimitOrder(marketCode: $marketCode, amount: $amount, limitPrice: $limitPrice, sell: $sell){
-                _id
+        query ($orderId: ID!){
+            order(orderId: $orderId) {
+                filled
+                status
                 trades {
                     amount
                     price
@@ -34,10 +35,7 @@ def new_position(api_key, secret_key, marketCode, amount, limitPrice, sell):
     '''
 
     variables = {
-        'marketCode': marketCode,
-        'amount': int(amount),
-        'limitPrice': limitPrice,
-        'sell': sell
+        'orderId': orderId,
     }
 
     # se junta en una sola variable
@@ -77,6 +75,6 @@ def new_position(api_key, secret_key, marketCode, amount, limitPrice, sell):
     response.raise_for_status()
     # se decodifican los datos desde json
     data = json.loads(response.text)
-    data = data['data']
+    data = data['data']['order']
 
     return data
