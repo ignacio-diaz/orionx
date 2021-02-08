@@ -34,3 +34,17 @@ def query_market_amount_to_spend(market, amount, sell, api_key, secret_key):
     amount_to_spend = data["marketEstimateAmountToSpend"]
     
     return amount_to_spend
+
+if __name__ == "__main__":
+    api_key = input("Ingresa tu API_KEY : ")
+    secret_key = input("Ingresa tu SECRET_KEY : ")
+    market = input("Ingresa el mercado de tu interés : ")
+    amount = input("Ingresa el monto que deseas ver (en notación máquina) : ")
+    sell = input("Comprar(C) o Vender(V)? : ")
+    if sell == "C" or sell == "c":
+        sell = False
+    elif sell == "V" or sell == "v":
+        sell = True
+    else:
+        raise ValueError("no se puso v o c")
+    print(query_market_amount_to_spend(market, amount, sell, api_key, secret_key))

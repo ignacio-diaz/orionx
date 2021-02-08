@@ -33,3 +33,8 @@ def fee_limit(api_key, secret_key):
     limit_fee = data['me']['marketFees']['limit']
 
     return limit_fee
+
+if __name__ == "__main__"
+    api_key = input("Ingresa tu API_KEY : ")
+    secret_key = input("Ingresa tu SECRET_KEY : ")
+    print(fee_limit(api_key, secret_key))

@@ -32,3 +32,8 @@ def get_markets(api_key, secret_key):
     markets = data['markets']
 
     return markets
+
+if __name__ == "__main__" :
+    api_key = input("Ingresa tu API_KEY : ")
+    secret_key = input("Ingresa tu SECRET_KEY : ")
+    print(get_markets(api_key, secret_key))

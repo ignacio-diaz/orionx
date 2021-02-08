@@ -17,9 +17,6 @@ def hmac_sha512(secret_key, timestamp, body):
 
 def order(api_key, secret_key, orderId):
 
-    #print(f"comienzo meter {time.time()}") 
-
-    #se crea el mensaje para poner posiciones
     query_str = '''
         query ($orderId: ID!){
             order(orderId: $orderId) {
@@ -37,25 +34,12 @@ def order(api_key, secret_key, orderId):
     variables = {
         'orderId': orderId,
     }
-
-    # se junta en una sola variable
     query = {
         'query': query_str,
         'variables': variables
     }
-
-    # Contenido total de la consulta en JSON
     body = json.dumps(query)  
-
-    # Marca de tiempo en segundos convertido a string
-    # (el header solo acepta strings)
     timestamp = str(time.time())
-
-    # Llenar con la Api Key
-
-    # Llenar con el secret key
-
-    # String del codigo HMAC
     signature = str(hmac_sha512(secret_key, timestamp, body))
 
     headers = {
@@ -64,17 +48,15 @@ def order(api_key, secret_key, orderId):
         'X-ORIONX-APIKEY': api_key, # API Key
         'X-ORIONX-SIGNATURE': signature, #  Firma
     }
-
-    # url del servidor
-    url = 'https://api2.orionx.com/graphql'
-
-    # Se envia usando POST y 
-    # se usa el parametro data para enviar los datos del body
-    response = requests.post(url=url, headers=headers, data=body)
-    # levanta un error si la peticion fue rechazada
+    response = requests.post('https://api2.orionx.com/graphql', headers=headers, data=body)
     response.raise_for_status()
-    # se decodifican los datos desde json
     data = json.loads(response.text)
     data = data['data']['order']
 
     return data
+
+if __name__ == "__main__" :
+    api_key = input("Ingresa tu API_KEY : ")
+    secret_key = input("Ingresa tu SECRET_KEY : ")
+    orderId = input("Ingresa una orderid : ")
+    print(order(api_key,secret_key,orderId))

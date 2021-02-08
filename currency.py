@@ -35,3 +35,9 @@ def currency(market, api_key, secret_key):
     balance = data['currency']['myWallet']['availableBalance']
     
     return [units, balance]
+
+if __name__ == "__main__":
+    api_key = input("Ingresa tu API_KEY : ")
+    secret_key = input("Ingresa tu SECRET_KEY : ")
+    market = input("Ingresa la moneda de tu interés : ")
+    print(currency(market, api_key, secret_key))

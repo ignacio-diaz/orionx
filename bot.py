@@ -5,14 +5,8 @@ from fees import fee_limit
 from market_estimate_amount_to_spend import query_market_amount_to_spend
 from new_position import new_position
 from order import order
+from marketOrderBook import orderBook
 
-"""cómo funciona este bot?
-Se le entregan las configuraciones
-market
-is_selling
-amount
-api_key
-secret_key"""
 def human_to_machine(decimals, amount):
     if decimals == 0:
         return amount
@@ -74,8 +68,11 @@ signature_2="""
 
 　　　.　　　　　　　　　　. 　　　　　　　　　　.　　　　　　　　　　　　　.
 
-.　　　　　　　　　　　🌎 ‍　　　　. 　　　　　　　　　　　 ,　 　　　"""
-print(signature_2+"\n\n")
+.　　　　　　　　　　　🌎 ‍　　　　. 　　　　　　　　　　　 ,　 　　　　　　　
+
+
+"""
+print(signature_2)
 time.sleep(1)
 
 try:
@@ -116,6 +113,8 @@ except:
         print("Cerrando el bot")
         sys.exit(1)
 
+order_book = orderBook(api_key, secret_key, market)
+
 #comprobation
 market_list = markets.get_markets(api_key, secret_key)
 market_splitted = market_splitter(market_list)
@@ -128,6 +127,11 @@ if config_selling == "v" or config_selling == "V":
     if amount > amount_in_human:
         print("monto superior a lo que hay en la billetera. cerrando bot.")
         sys.exit(1)
+    order_book = order_book['buy']
+    for pos in order_book:
+        if pos['accumulated'] > amount_first_currency_in_machine:
+            price_to_trade = pos['limitPrice']
+            break
 elif config_selling == "c" or config_selling == "C":
     sell = False
     wallet = balance_in_wallets(market_splitted[1])
@@ -138,6 +142,12 @@ elif config_selling == "c" or config_selling == "C":
     if amount_to_buy > wallet:
         print("monto superior a lo que hay en la billetera. cerrando")
         sys.exit(1)
+    order_book = order_book['sell']
+    for pos in order_book:
+        if pos['accumulated'] > amount_first_currency_in_machine:
+            price_to_trade = pos['limitPrice']
+            break
+
 else:
     print("bot mal configurado (V o C). Cerrando el bot")
     sys.exit(1)
@@ -155,14 +165,25 @@ then every 60 secs, see if the position has been filled. If was filled, then sta
 filled = 0
 cicles = 0
 
-position = new_position(api_key, secret_key, market, (amount_first_currency_in_machine / (1 - limit_fee)), 100000000, sell)
+position = new_position(api_key, secret_key, market, (amount_first_currency_in_machine / (1 - limit_fee)), price_to_trade, sell)
 if position['trades'] == []:
     trades = order(api_key, secret_key, position['_id'])
     position['trades'] = trades['trades']
 
-if len(position['trades']) > 1:
-    for x in len(position['trades']):
-        print("prueba")
+total_cost = 0
+total_amount = 0
+PPP_price_buy = 0
+PPP_price_sell = 0
+#if len(position['trades']) > 1:
+for x in range(len(position['trades'])):
+    if x == 0:
+        PPP_price = position['trades'][x]['price'] * (position['trades'][x]['amount'] * (1 - limit_fee)) / (position['trades'][x]['amount'] * (1 - limit_fee))
+        PPP_amount = position['trades'][x]['amount']
+    PPP_price = ((PPP_price * PPP_amount) + (position['trades'][x]['price'] * position['trades'][x]['amount'])) / ((position['trades'][x]['amount'] + PPP_amount) * (1 - limit_fee))
+"""else:
+    PPP_price = position['trades'][0]['price']"""
+
+
 
 
 

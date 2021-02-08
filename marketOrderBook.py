@@ -23,11 +23,13 @@ def orderBook(api_key, secret_key, marketCode):
               amount
               limitPrice
               accumulated
+              accumulatedPrice
             }
             buy {
               amount
               limitPrice
               accumulated
+              accumulatedPrice
             }
           }
         }
@@ -55,4 +57,11 @@ def orderBook(api_key, secret_key, marketCode):
     response.raise_for_status()
     data = json.loads(response.text)
 
-    return data['data']
+    return data['data']['marketOrderBook']
+
+
+if __name__ == "__main__":
+  api_key = input("Ingresa tu API_KEY : ")
+  secret_key = input("Ingresa tu SECRET_KEY : ")
+  marketCode = input("Mercado a analizar : ")
+  print(orderBook(api_key, secret_key, marketCode))
