@@ -28,10 +28,9 @@ def get_markets(api_key, secret_key):
 
     response = requests.post('https://api2.orionx.com/graphql', headers=headers, data=body)
     data = json.loads(response.text)
-    data = data['data']
-    markets = data['markets']
+    data = data['data']['markets']
 
-    return markets
+    return data
 
 if __name__ == "__main__" :
     api_key = input("Ingresa tu API_KEY : ")

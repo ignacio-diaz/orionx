@@ -38,6 +38,7 @@ def market_splitter(market_list):
     return [market_1, market_2]
 
 signature ="""
+                  ¡¡¡AÚN NO TERMINADO!!!
     ┌────────────────────────────────────────────────┐
     │                                                │
     │            Bot para OrionX (v1.0.0)            │
@@ -128,10 +129,10 @@ if config_selling == "v" or config_selling == "V":
         print("monto superior a lo que hay en la billetera. cerrando bot.")
         sys.exit(1)
     order_book = order_book['buy']
-    for pos in order_book:
-        if pos['accumulated'] > amount_first_currency_in_machine:
-            price_to_trade = pos['limitPrice']
-            break
+    #for pos in order_book:
+        #if pos['accumulated'] > amount_first_currency_in_machine:
+            #price_to_trade = pos['limitPrice']
+            #break
 elif config_selling == "c" or config_selling == "C":
     sell = False
     wallet = balance_in_wallets(market_splitted[1])
@@ -172,25 +173,52 @@ if position['trades'] == []:
 
 total_cost = 0
 total_amount = 0
-PPP_price_buy = 0
-PPP_price_sell = 0
+PPP_price = 0
 #if len(position['trades']) > 1:
 for x in range(len(position['trades'])):
     if x == 0:
         PPP_price = position['trades'][x]['price'] * (position['trades'][x]['amount'] * (1 - limit_fee)) / (position['trades'][x]['amount'] * (1 - limit_fee))
-        PPP_amount = position['trades'][x]['amount']
-    PPP_price = ((PPP_price * PPP_amount) + (position['trades'][x]['price'] * position['trades'][x]['amount'])) / ((position['trades'][x]['amount'] + PPP_amount) * (1 - limit_fee))
-"""else:
-    PPP_price = position['trades'][0]['price']"""
+        PPP_amount = position['trades'][x]['amount'] * (1 - limit_fee)
+    else:
+        PPP_price = ((PPP_price * PPP_amount) + (position['trades'][x]['price'] * position['trades'][x]['amount'])) / ((position['trades'][x]['amount'] + PPP_amount) * (1 - limit_fee))
+        PPP_amount += (position['trades'][x]['amount'] * (1 - limit_fee))
 
+"""now that we know at what price we really buy/sell, que put a new order with a delta %. """
+print(f"Realizamos la orden en el precio {PPP_price}.")
+if sell == True:
+    print(f"Ahora vendemos en {( PPP_price * ( 1 + utility / 100 ) / ( 1 - limit_fee ))}")
+    position = new_position(api_key, secret_key, market, PPP_amount, ( PPP_price * ( 1 + utility / 100 ) / ( 1 - limit_fee )), sell)
+    if position['trades'] == []:
+        try:
+            trades = order(api_key, secret_key, position['_id'])
+            total_amount = trades['trades']
+        except:
+            "no se han hecho trades aún"
+    else:
+        for x in range(len(position['trades'])):
+            if x == 0:
+                total_amount = position['trades'][x]['amount'] * (1 - limit_fee)
+            else:
+                total_amount += (position['trades'][x]['amount'] * (1 - limit_fee))
 
-
+else:
+    print(f"ahora compramos en {( PPP_price * ( 1 - utility / 100) )}")
+    position = new_position(api_key, secret_key, market, (PPP_amount / ( 1 - limit_fee )), ( PPP_price * ( 1 - utility / 100) ), sell )
+    if position['trades'] == []:
+        try:
+            trades = order(api_key, secret_key, position['_id'])
+            total_amount = trades['trades']
+        except:
+            "no se han hecho trades aún"
+    else:
+        for x in range(len(position['trades'])):
+            if x == 0:
+                total_amount = position['trades'][x]['amount']
+            else:
+                total_amount += position['trades'][x]['amount']
 
 
 
 
 
 print("holi")
-
-
-

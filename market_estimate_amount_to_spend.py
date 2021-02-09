@@ -30,8 +30,7 @@ def query_market_amount_to_spend(market, amount, sell, api_key, secret_key):
 
     response = requests.post('https://api2.orionx.com/graphql', headers=headers, data=body)
     data = json.loads(response.text)
-    data = data['data']
-    amount_to_spend = data["marketEstimateAmountToSpend"]
+    amount_to_spend = data['data']["marketEstimateAmountToSpend"]
     
     return amount_to_spend
 
