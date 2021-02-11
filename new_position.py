@@ -51,10 +51,6 @@ def new_position(api_key, secret_key, marketCode, amount, limitPrice, sell):
     # (el header solo acepta strings)
     timestamp = str(time.time())
 
-    # Llenar con la Api Key
-
-    # Llenar con el secret key
-
     # String del codigo HMAC
     signature = str(hmac_sha512(secret_key, timestamp, body))
 
