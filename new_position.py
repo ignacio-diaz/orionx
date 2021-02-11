@@ -61,12 +61,9 @@ def new_position(api_key, secret_key, marketCode, amount, limitPrice, sell):
         'X-ORIONX-SIGNATURE': signature, #  Firma
     }
 
-    # url del servidor
-    url = 'https://api2.orionx.com/graphql'
-
     # Se envia usando POST y 
     # se usa el parametro data para enviar los datos del body
-    response = requests.post(url=url, headers=headers, data=body)
+    response = requests.post('https://api2.orionx.com/graphql', headers=headers, data=body)
     # levanta un error si la peticion fue rechazada
     response.raise_for_status()
     # se decodifican los datos desde json
