@@ -17,8 +17,6 @@ def hmac_sha512(secret_key, timestamp, body):
 
 def new_position(api_key, secret_key, marketCode, amount, limitPrice, sell):
 
-    #print(f"comienzo meter {time.time()}") 
-
     #se crea el mensaje para poner posiciones
     query_str = '''
         mutation ($marketCode: ID, $amount: BigInt, $limitPrice: BigInt, $sell: Boolean){
