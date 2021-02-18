@@ -2,20 +2,18 @@ import json, time, requests
 from new_position import hmac_sha512 
 
 def currency(market, api_key, secret_key):
-    query_str = '''
-    query($code: ID){
-        currency(code: $code) {
+    query_str = f'''
+    query{{
+        currency(code: "{market}") {{
             units
-            myWallet {
+            myWallet {{
                 availableBalance
-            }
-        }
-    }
+            }}
+        }}
+    }}
     '''
-    variables = {'code': market}
     query = {
-    'query': query_str,
-    'variables': variables
+    'query': query_str
     }
 
     body = json.dumps(query)
