@@ -24,7 +24,7 @@ def currency(market, api_key, secret_key):
         'X-ORIONX-TIMESTAMP': timestamp,
         'X-ORIONX-APIKEY': api_key,
         'X-ORIONX-SIGNATURE': signature,
-        }
+    }
 
     response = requests.post('https://api2.orionx.com/graphql', headers=headers, data=body)
     data = json.loads(response.text)
