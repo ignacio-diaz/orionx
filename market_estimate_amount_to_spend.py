@@ -8,11 +8,7 @@ def query_market_amount_to_spend(market, amount, sell, api_key, secret_key):
     }}
     '''
 
-    query = {
-    'query': query_str
-    }
-
-    body = json.dumps(query)
+    body = json.dumps({'query': query_str})
     timestamp = str(time.time())
     signature = str(hmac_sha512(secret_key, timestamp, body))
     headers = {
