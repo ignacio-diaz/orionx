@@ -32,7 +32,7 @@ def currency(market, api_key, secret_key):
     units = data['currency']['units']
     balance = data['currency']['myWallet']['availableBalance']
     
-    return [units, balance]
+    return balance/(10**units)
 
 if __name__ == "__main__":
     api_key = input("Ingresa tu API_KEY : ")
