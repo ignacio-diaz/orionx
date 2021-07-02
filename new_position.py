@@ -1,7 +1,4 @@
-import json
-import hmac
-import requests
-import time
+import json, hmac, requests, time
 from hashlib import sha512
 
 def hmac_sha512(secret_key, timestamp, body):
