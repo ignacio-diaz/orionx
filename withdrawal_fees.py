@@ -17,7 +17,7 @@ def fetch_currencies(api_key, secret_key):
             }
         }
     }
-'''
+    '''
     query = {
     'query': query_str
     }
@@ -42,7 +42,7 @@ def fetch_currencies(api_key, secret_key):
     for asset in data:
         if len(asset["networks"]) == 0:
             continue
-        elif len(asset["networks"]) > 0:
+        else:
             n = {}
             for networks in asset["networks"]:
                 for metadata in asset["metadataByNetwork"]:
