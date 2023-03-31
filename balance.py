@@ -13,6 +13,7 @@ def get_balance(api_key, secret_key):
                     units
                 }
                 balance
+                availableBalance
                 }
         }
     }'''
@@ -38,7 +39,18 @@ def get_balance(api_key, secret_key):
     new_balance = {}
 
     for asset in data:
-        new_balance[asset["currency"]["code"]] = asset["balance"] / 10 ** asset["currency"]["units"]
+        if asset["availableBalance"] == 0:
+            free = None
+            used = None
+        else:
+            free = asset["availableBalance"] / 10 ** asset["currency"]["units"]
+            used = (asset["balance"] - asset["availableBalance"]) / 10 ** asset["currency"]["units"]
+        total = asset["balance"] / 10 ** asset["currency"]["units"]
+        new_balance[asset["currency"]["code"]] = {
+            "free": free,
+            "used": used,
+            "total": total
+            }
 
     return new_balance
 
