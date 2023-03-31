@@ -39,12 +39,8 @@ def get_balance(api_key, secret_key):
     new_balance = {}
 
     for asset in data:
-        if asset["availableBalance"] != 0:
-            free = asset["availableBalance"] / 10 ** asset["currency"]["units"]
-            used = (asset["balance"] - asset["availableBalance"]) / 10 ** asset["currency"]["units"]
-        else:
-            free = None
-            used = None
+        free = asset["availableBalance"] / 10 ** asset["currency"]["units"]
+        used = (asset["balance"] - asset["availableBalance"]) / 10 ** asset["currency"]["units"]
         total = asset["balance"] / 10 ** asset["currency"]["units"]
         new_balance[asset["currency"]["code"]] = {
             "free": free,
