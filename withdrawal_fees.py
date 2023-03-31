@@ -43,12 +43,13 @@ def fetch_currencies(api_key, secret_key):
         if len(asset["networks"]) == 0:
             continue
         else:
-            n = {}
+            net = {}
             for networks in asset["networks"]:
                 for metadata in asset["metadataByNetwork"]:
                     if metadata["code"] == networks["code"]:
-                        n[networks["code"]] = metadata["withdrawalFee"] / 10 ** metadata["units"]
-            currencies[asset["code"]] = n
+                        net = {"fees" : {}}
+                        net["fees"][networks["code"]] = metadata["withdrawalFee"] / 10 ** metadata["units"]
+            currencies[asset["code"]] = net
 
     return currencies
 
