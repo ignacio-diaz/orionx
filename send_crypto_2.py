@@ -1,11 +1,5 @@
 import json, hmac, requests, time
-import string
 from hashlib import sha512
-import ccxt
-
-bnb = ccxt.binance
-
-#bnb.withdraw(code=code, amount= amount, address= address, tag=tag)
 
 def hmac_sha512(secret_key, timestamp, body):
     # para usar hmac es necesario convertir el secret key 
