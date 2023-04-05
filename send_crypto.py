@@ -117,8 +117,8 @@ def withdraw(api_key, secret_key, wallet, amount, network, address):
     return data
 
 if __name__ == "__main__":
-    api_key = input("Ingresa tu API_KEY (debe tener permiso de 'send'"): ")
-    secret_key = input("Ingresa tu SECRET_KEY : ")
+    api_key = input("Ingresa tu API_KEY (debe tener permiso de 'send': ")
+    secret_key = input("Ingresa tu SECRET_KEY: ")
     print("""----------
     
     """)
