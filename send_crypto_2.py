@@ -69,7 +69,7 @@ def withdraw(api_key, secret_key, code, amount, address=str, tag=None, params=No
 
     #se crea el mensaje para poner posiciones
     query_str = f"""mutation {{
-                        sendCrypto(fromWalletId: "{wallet['walletId']}", toAddressCode: "{address}", amount: {amount * 10 ** wallet['units']}, network: "{network}") {{
+                        sendCrypto(fromWalletId: "{wallet['walletId']}", clientId: "{address}", amount: {amount * 10 ** wallet['units']}, network: "{network}") {{
                             _id
                         }}
                     }}"""
