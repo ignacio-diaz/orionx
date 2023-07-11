@@ -78,12 +78,14 @@ def fetch_my_trades(api_key, secret_key, page, date):
     # levanta un error si la peticion fue rechazada
     response.raise_for_status()
     # se decodifican los datos desde json
-    data = json.loads(response.text)
-    data = {"units": data['data']['currency']["units"], "walletId": data['data']['currency']["myWallet"]["_id"]}
+    data = json.loads(response.text)["data"]["transactions"]
 
     return data
 
 if __name__ == "__main__":
-    api_key = input("Ingresa tu API_KEY (debe tener permiso de 'send': ")
+    api_key = input("Ingresa tu API_KEY: ")
     secret_key = input("Ingresa tu SECRET_KEY: ")
+    page = input("Ingresa que numero de pagina quieres analizar: ")
+    date = int(input("Ingresa el tiempo en timestamp desde qué fecha deseas que traiga la data (finalmente trae desde el comienzo de ese día): "))
+    a = fetch_my_trades(api_key, secret_key, page, date)
 
