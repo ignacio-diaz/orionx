@@ -12,39 +12,35 @@ def hmac_sha512(secret_key, timestamp, body):
 
     return hmac.HMAC(key, msg, sha512).hexdigest()
 
-def fetch_my_trades(api_key, secret_key, page, date):
+def fetch_my_trades(api_key, secret_key, page):
     query_str = f"""query{{
-        transactions (page:{page}, initPeriod:{date}, sortBy:"date"){{
-            page
+        orders(sortBy: "activatedAt", sortType:DESC, page:{page}, limit:7000){{
             totalCount
             totalPages
             hasNextPage
             hasPreviousPage
             items{{
                 _id
-                amount
-                price
-                cost
-                commission
-                date
-                type
-                hash
-                description
-                market {{
-                    name
+                clientId
+                sell
+                trades{{
+                    _id
+                    amount
+                    price
+                    totalCost
+                    date
+                    market{{
+                        name
+                        mainCurrency{{
+                            units
+                        }}
+                        secondaryCurrency{{
+                            units
+                        }}
+                    }}
                 }}
-                currency {{
-                    code
-                    units
-                }}
-                pairCurrency {{
-                    code
-                    units
-                }}
-                explorerURL
-                isInside
             }}
-	    }}
+        }}
     }}
 """
 
@@ -78,14 +74,37 @@ def fetch_my_trades(api_key, secret_key, page, date):
     # levanta un error si la peticion fue rechazada
     response.raise_for_status()
     # se decodifican los datos desde json
-    data = json.loads(response.text)["data"]["transactions"]
+    data = json.loads(response.text)["data"]["orders"]
 
     return data
 
 if __name__ == "__main__":
     api_key = input("Ingresa tu API_KEY: ")
     secret_key = input("Ingresa tu SECRET_KEY: ")
-    page = input("Ingresa que numero de pagina quieres analizar: ")
-    date = int(input("Ingresa el tiempo en timestamp desde qué fecha deseas que traiga la data (finalmente trae desde el comienzo de ese día): "))
-    a = fetch_my_trades(api_key, secret_key, page, date)
+    #page = int(input("Ingresa que numero de pagina quieres analizar: "))
+    trade_list = []
+    page = 1
+    last_page = 10000
+    while page <= last_page:
+        a = fetch_my_trades(api_key, secret_key, page)
+        for trades in a["items"]:
+            if trades["trades"] != []:
+                for inner_trade in trades["trades"]:
+                    if trades["sell"] == True:
+                        trades["sell"] = "sell"
+                    else:
+                        trades["sell"] = "buy"
+                    trade_list.append({
+                        "id": inner_trade["_id"],
+                        "order": trades["_id"],
+                        "time": inner_trade["date"],
+                        "symbol": inner_trade["market"]["name"],
+                        "side": trades["sell"],
+                        "price": inner_trade["price"] / 10 ** inner_trade["market"]["secondaryCurrency"]["units"],
+                        "amount": inner_trade["amount"] / 10 ** inner_trade["market"]["mainCurrency"]["units"],
+                        "cost": inner_trade["totalCost"] / 10 ** inner_trade["market"]["secondaryCurrency"]["units"],
+                        "client_order_id": trades["clientId"]
+                    })
+        page += 1
+        last_page = a["totalPages"]
 
