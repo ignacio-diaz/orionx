@@ -1,5 +1,16 @@
-import json, time, requests
-from new_position import hmac_sha512 
+import json, time, requests, hmac
+from hashlib import sha512
+
+def hmac_sha512(secret_key, timestamp, body):
+    # para usar hmac es necesario convertir el secret key 
+    # de string utf-8 a bytearray
+    key = bytearray(secret_key, 'utf-8')
+    msg = str(timestamp) + str(body)
+
+    # ademas sha512 requiere de strings codificados
+    msg = msg.encode('utf-8')
+
+    return hmac.HMAC(key, msg, sha512).hexdigest()
 
 def get_ceros(api_key, secret_key):
 
