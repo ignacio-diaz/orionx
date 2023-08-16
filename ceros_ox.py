@@ -33,7 +33,6 @@ def get_ceros(api_key, secret_key):
     data = json.loads(response.text)
     data = data['data']["me"]["wallets"]
 
-    new_balance = {}
     ceros = {}
 
     for asset in data:
