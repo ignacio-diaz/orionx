@@ -21,9 +21,6 @@ def wallets_id(api_key:str, secret_key:str, wallet_market:str):
                 me {{
                     wallets {{
                         _id
-                        currency {{
-                            code
-                        }}
                     }}
                 }}
             }} """
@@ -61,9 +58,9 @@ def wallets_id(api_key:str, secret_key:str, wallet_market:str):
     data = json.loads(response.text)
     data = data["data"]["me"]["wallets"]
 
+    wallet_array = []
     for wallet in data:
-        if wallet['currency']['code'] == wallet_market:
-            return wallet['_id']
+        wallet_array.append(wallet["_id"])
     
     return "error! walletId not found."
 
