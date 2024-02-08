@@ -11,33 +11,28 @@ def hmac_sha512(secret_key, timestamp, body):
     msg = str(timestamp) + str(body)
 
     # ademas sha512 requiere de strings codificados
-    msg = msg.encode('utf-8')
+    msg = msg.encode()
 
     return hmac.HMAC(key, msg, sha512).hexdigest()
 
 def orderBook(api_key, secret_key, marketCode):
     query_str = '''
-      query marketOrderBook($marketCode: ID!, $limit: Int) {
-          marketOrderBook(marketCode: $marketCode, limit: $limit) {
-            sell {
-              amount
-              limitPrice
-              accumulated
-              accumulatedPrice
-            }
-            buy {
-              amount
-              limitPrice
-              accumulated
-              accumulatedPrice
-            }
+      query getData($marketCode: ID!) {
+          data: marketOrderBook(marketCode: $marketCode, limit: 50) {
+              buy {
+                  amount
+                  limitPrice
+              }
+              sell {
+                  amount
+                  limitPrice
+              }
           }
-        }
+      }
     '''
 
     variables = {
       'marketCode': marketCode,
-      'limit': 15
     }
     query = {
       'query': query_str,
@@ -57,7 +52,7 @@ def orderBook(api_key, secret_key, marketCode):
     response.raise_for_status()
     data = json.loads(response.text)
 
-    return data['data']['marketOrderBook']
+    return data['data']
 
 
 if __name__ == "__main__":
