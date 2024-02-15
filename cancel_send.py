@@ -1,4 +1,8 @@
-import json, hmac, requests, time
+import json
+import hmac
+import requests
+import time
+import logging
 from hashlib import sha512
 
 def hmac_sha512(secret_key, timestamp, body):
@@ -84,61 +88,70 @@ def cancel_orders(orders_to_cancel):
         return data['errors'][0]['details']['code']
     return True
 
+def send(code:str, amount:float, address:str, network:str, tag=None, params=None):
+    query_str = f"""query {{
+        me {{
+            wallets {{
+                _id
+                currency {{
+                    code
+                    units
+                }}
+            }}
+        }}
+    }}"""
+
+        # se junta en una sola variable
+    data = ox_query(query_str)
+    data = data["data"]["me"]["wallets"]
+
+    for wallet in data:
+        if wallet['currency']['code'] == code:
+            wallet_id =  wallet['_id']
+            asset_units = wallet['currency']['units']
+
+
+    # se crea el mensaje para poner posiciones
+    query_str = f"""mutation {{sendCrypto(clientId:"{address}", amount:{amount * 10 ** asset_units}, fromWalletId:"{wallet_id}", network:"{network}" ) {{
+        _id
+        amount
+        commission
+        }}
+    }}"""
+
+    # se junta en una sola variable
+    data = ox_query(query_str)
+    if data.get("errors"):
+        print(data['errors'][0]['message'])
+        return data['errors'][0]['message']
+    data = data["data"]["sendCrypto"]["_id"]
+
+    return data
+
 def withdraw(
-        api_key, secret_key, code, amount:float, address:str, network:str, tag=None, params=None
+        code, amount:float, address:str, network:str, tag=None, params=None
     ):
         
         while True:
-            orders = get_orders(code)
-            cancel = cancel_orders(orders)
-            if cancel == True:
-                print()
-                break
-            else:
-                if cancel == "no-orders":
-                    break
-                print(f"error: {cancel}")
-                time.sleep(5)
-        time.sleep(1)
-
-
-        query_str = f"""query {{
-                me {{
-                    wallets {{
-                        _id
-                        currency {{
-                            code
-                            units
-                        }}
-                    }}
-                }}
-            }} """
-
-            # se junta en una sola variable
-        data = ox_query(query_str)
-        data = data["data"]["me"]["wallets"]
-
-        for wallet in data:
-            if wallet['currency']['code'] == code:
-                wallet_id =  wallet['_id']
-                asset_units = wallet['currency']['units']
-    
-
-        # se crea el mensaje para poner posiciones
-        query_str = f"""mutation {{sendCrypto(clientId:"{address}", amount:{amount * 10 ** asset_units}, fromWalletId:"{wallet_id}", network:"{network}" ) {{
-                        _id
-                        amount
-                        commission
-                        }}
-                    }}"""
-
-        # se junta en una sola variable
-        data = ox_query(query_str)
-        if data.get("errors"):
-            return data['errors'][0]['message']
-        data = data["data"]["sendCrypto"]["_id"]
-
-        return data
+            try:
+                orders = get_orders(code)
+                cancel = cancel_orders(orders)
+                if cancel == True:
+                    print()
+                else:
+                    if cancel == "no-orders":
+                        print("no orders to close")
+                    print(f"error: {cancel}")
+                    time.sleep(5)
+                time.sleep(1)
+                send_ = send(code, amount, address, network, tag, params)
+                if "[noFunds]" in send_ or "[concurrent]" in send_:
+                    logging.error(f"{send_}. trying again!")
+                    continue
+                return send_
+            except Exception as e:
+                logging.error(f"error! {e}")
+                return e
 
 if __name__ == "__main__":
     api_key = input("Ingresa tu API_KEY (debe tener permiso de 'send': ")
@@ -147,5 +160,5 @@ if __name__ == "__main__":
     amount = float(input("escribe el monto que deseas enviar: "))
     address = input("a que direccion deseas enviar?: ")
     network = input("escribe la red que deseas ocupar: ")
-    print(withdraw(api_key, secret_key, asset, amount, address, network="ORX"))
+    print(withdraw(asset, amount, address, network))
     print()
