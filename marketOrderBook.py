@@ -58,5 +58,5 @@ def orderBook(api_key, secret_key, marketCode):
 if __name__ == "__main__":
   api_key = input("Ingresa tu API_KEY : ")
   secret_key = input("Ingresa tu SECRET_KEY : ")
-  marketCode = input("Mercado a analizar : ")
+  marketCode = input("Mercado a analizar (ej BTCCLP): ")
   print(orderBook(api_key, secret_key, marketCode))
