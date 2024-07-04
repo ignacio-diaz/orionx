@@ -4,3 +4,4 @@ bot.py
 .env
 orionx_data.py
 pay_loans.py
+withdrawal_addresses.py
