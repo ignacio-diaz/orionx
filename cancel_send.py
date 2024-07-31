@@ -154,7 +154,7 @@ def withdraw(
                 return e
 
 if __name__ == "__main__":
-    api_key = input("Ingresa tu API_KEY (debe tener permiso de 'send': ")
+    api_key = input("Ingresa tu API_KEY (debe tener permiso de 'send', 'trade' y 'stats'): ")
     secret_key = input("Ingresa tu SECRET_KEY: ")
     asset = input("Ingresa el asset que deseas enviar: ")
     amount = float(input("escribe el monto que deseas enviar: "))
